@@ -20,12 +20,25 @@ public class Eklogs: NSObject {
         sessionStart()
     }
     
+    private func authorization() -> String {
+        let loginString = String(format: "%@:%@", logUser, logPassword)
+        let loginData = loginString.data(using: String.Encoding.utf8)!
+        let base64LoginString = loginData.base64EncodedString()
+        return base64LoginString
+    }
+    
     public func sessionStart() {
         var sessionData: [String: String?] = [:]
         
         func start() {
             let urlSession = URLSession.shared
-            let request = EndPoint.log.request(body: sessionData as [String : Any])
+            let param = [
+                "records": [
+                    ["value": sessionData]
+                ]
+            ]
+            var request = EndPoint.log.request(body: param as [String : Any])
+            request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
             urlSession.dataTask(request: request) { (object: String) in
                 
             } failure: { (error) in
@@ -85,8 +98,14 @@ public class Eklogs: NSObject {
             "x": x,
             "y": y
         ]
+        let param = [
+            "records": [
+                ["value": eventDict]
+            ]
+        ]
         let urlSession = URLSession.shared
-        let request = EndPoint.event.request(body: eventDict as [String : Any])
+        var request = EndPoint.event.request(body: param as [String : Any])
+        request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
         urlSession.dataTask(request: request) { (object: String) in
             
         } failure: { (error) in

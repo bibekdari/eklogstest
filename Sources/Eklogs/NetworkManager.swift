@@ -7,67 +7,16 @@
 
 import Foundation
 
-
 protocol Container: Codable {
-    var allErrors: [APIError]? {get}
-    var hasData: Bool {get}
-    var meta: APIMeta? {get}
-    var error: APIError? {get}
-    var errors: [APIError]? {get}
-}
-
-extension Container {
-    var allErrors: [APIError]? {
-        return error == nil ? errors : [error!]
-    }
+    
 }
 
 struct SingleContainer<T: Codable>: Container {
     let data: T?
-    let meta: APIMeta?
-    let error: APIError?
-    let errors: [APIError]?
-    
-    var hasData: Bool {
-        return data != nil
-    }
-}
-
-struct ArrayContainer<T: Codable>: Container {
-    let data: [T]?
-    let meta: APIMeta?
-    let error: APIError?
-    let errors: [APIError]?
-    
-    var hasData: Bool {
-        return data != nil
-    }
-}
-
-struct APIMeta: Codable {
-    let copyright: String
-    let site: String
-    let emails: [String]
-    let api: APIInfo
-}
-
-struct APIInfo: Codable {
-    let version: Double
-}
-
-struct APIError: Codable {
-    let title: String
-    let detail: String
-}
-
-extension APIError {
-    var error: Error {
-        return NSError(domain: "API_ERROR", code: 500, userInfo: [NSLocalizedDescriptionKey: detail])
-    }
 }
 
 struct LogRequest {
-    let request: URLRequest
+    var request: URLRequest
     let endPoint: EndPoint
     
     init(request: URLRequest, endPoint: EndPoint) {
@@ -77,11 +26,13 @@ struct LogRequest {
 }
 
 enum EndPoint {
+    case authenticate
     case log
     case event
     
     private var path: String {
         switch self {
+        case .authenticate: return ""
         case .log: return "ekmobile-bigmart-dev"
         case .event: return "ekmobile-bigmart-event-dev"
         }
@@ -89,7 +40,7 @@ enum EndPoint {
     
     private var method: String {
         switch self {
-        case .log, .event:
+        case .log, .event, .authenticate:
             return "POST"
 //        default:
 //            return "GET"
@@ -102,7 +53,7 @@ enum EndPoint {
         var request = URLRequest(url: url)
         request.httpMethod = method
         if method == "POST" || method == "DELETE" || method == "PUT" {
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/vnd.kafka.json.v2+json", forHTTPHeaderField: "Content-Type")
             if let body = body {
                 request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: .prettyPrinted)
             }
@@ -168,12 +119,12 @@ extension URLSession {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let container = try decoder.decode(T.self, from: data)
-                if let error = container.allErrors?.first?.error {
-                    return send(error: error)
-                }
-                if container.hasData {
-                    return send(object: container)
-                }
+//                if let error = container.allErrors?.first?.error {
+//                    return send(error: error)
+//                }
+//                if container.hasData {
+                return send(object: container)
+//                }
             } catch {
                 debugPrint(error)
             }
