@@ -124,13 +124,6 @@ enum EndPoint {
 
 extension URLSession {
     
-    struct File {
-        let name: String
-        let fileName: String
-        let data: Data
-        let contentType: String
-    }
-    
     @discardableResult
     func dataTask<T:Codable>(request: LogRequest, success: @escaping (T) -> (), failure: @escaping (Error) -> ()) -> URLSessionDataTask {
         let task = dataTask(with: request.request) { [weak self] (data, response, error) in
@@ -144,50 +137,6 @@ extension URLSession {
         }
         task.resume()
         return task
-    }
-    
-    @discardableResult
-    func upload<T: Codable>(request: LogRequest, params: [String: String], files: [File], success: @escaping (T) -> (), failure: @escaping (Error) -> ()) -> URLSessionUploadTask {
-        //        let url = URL(string: "http://api-host-name/v1/api/uploadfile/single")
-        
-        // generate boundary string using a unique per-app string
-        let boundary = UUID().uuidString
-        
-        // Set the URLRequest to POST and to the specified URL
-        var urlRequest = request.request
-        
-        // Set Content-Type Header to multipart/form-data, this is equivalent to submitting form data with file upload in a web browser
-        // And the boundary is also set here
-        urlRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        let data = createBodyWithParameters(parameters: params, files: files, boundary: boundary)
-        
-        // Send a POST request to the URL, with the data we created earlier
-        let task = uploadTask(with: urlRequest, from: data) { [weak self] (data, response, error) in
-            self?.handle(data: data, response: response, error: error, success: { (successData: SingleContainer<T>) in
-                success(successData.data!)
-            }, failure: failure)
-        }
-        task.resume()
-        return task
-    }
-    
-    private func createBodyWithParameters(parameters: [String: String], files: [File], boundary: String) -> Data {
-        var body = Data()
-        for (key, value) in parameters {
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-            body.append("\(value)\r\n".data(using: .utf8)!)
-        }
-        for file in files {
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"\(file.name)\"; filename=\"\(file.fileName)\"\r\n".data(using: .utf8)!)
-            body.append("Content-Type: \(file.contentType)\r\n\r\n".data(using: .utf8)!)
-            body.append(file.data)
-            body.append("\r\n".data(using: .utf8)!)
-        }
-        
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        return body
     }
     
     private func handle<T: Container>(data: Data?, response: URLResponse?, error: Error?, success: @escaping (T)->(), failure: @escaping (Error) -> ()) {
