@@ -8,14 +8,16 @@ public class Eklogs: NSObject {
     let uploadLog = "ekmobile-bigmart-dev"
     let eventLog="ekmobile-bigmart-event-dev"
     let baseURL = "https://drk.ekbana.net/topics/"
-    let logUser = "drk"
-    let logPassword = "Drk@ekbana31"
+    var logUser: String
+    var logPassword: String
     var latitude: Double?
     var longitude: Double?
     var sessionID: Date = Date()
     var locationObtained: (()->())?
     
-    public override init() {
+    public init(user: String, password: String) {
+        logUser = user
+        logPassword = password
         super.init()
         sessionStart()
     }
@@ -39,7 +41,7 @@ public class Eklogs: NSObject {
             ]
             var request = EndPoint.log.request(body: param as [String : Any])
             request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
-            urlSession.dataTask(request: request) { (object: String) in
+            urlSession.dataTask(request: request) { (object: LogResponse) in
                 
             } failure: { (error) in
                 debugPrint(error)
@@ -106,7 +108,7 @@ public class Eklogs: NSObject {
         let urlSession = URLSession.shared
         var request = EndPoint.event.request(body: param as [String : Any])
         request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
-        urlSession.dataTask(request: request) { (object: String) in
+        urlSession.dataTask(request: request) { (object: LogResponse) in
             
         } failure: { (error) in
             debugPrint(error)

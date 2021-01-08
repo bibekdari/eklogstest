@@ -15,6 +15,10 @@ struct SingleContainer<T: Codable>: Container {
     let data: T?
 }
 
+struct LogResponse: Codable {
+    
+}
+
 struct LogRequest {
     var request: URLRequest
     let endPoint: EndPoint
