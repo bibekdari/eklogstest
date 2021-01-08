@@ -117,6 +117,11 @@ extension URLSession {
             let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
             debugPrint(json)
         }
+        
+        if let data = data,
+           let string = String(data: data, encoding: .utf8) {
+            debugPrint(string)
+        }
 //        let statuscode = (response as? HTTPURLResponse)?.statusCode ?? 500
         if let data = data {
             do {
