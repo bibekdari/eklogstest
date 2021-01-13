@@ -58,7 +58,7 @@ public class Eklogs: NSObject {
             let urlSession = URLSession.shared
             let param = [
                 "records": [
-                    ["value": sessionData]
+                    "value": sessionData
                 ]
             ]
             var request = EndPoint.log(projectID).request(body: param as [String : Any])
@@ -131,7 +131,7 @@ public class Eklogs: NSObject {
         ]
         let param = [
             "records": [
-                ["value": eventDict]
+                "value": eventDict
             ]
         ]
         let urlSession = URLSession.shared
