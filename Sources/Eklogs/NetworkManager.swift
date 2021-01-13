@@ -13,6 +13,7 @@ protocol Container: Codable {
 
 struct SingleContainer<T: Codable>: Container {
     let offsets: T?
+    let result: T?
 }
 
 struct LogResponse: Codable {
@@ -29,25 +30,27 @@ struct LogRequest {
     }
 }
 
+let baseURL = "https://eklogs-sdk.ekbana.net/api/v1/"
+
 enum EndPoint {
-    case authenticate
-    case log
-    case event
+    case log(String)
+    case event(String)
+    case info(String)
     
     private var path: String {
         switch self {
-        case .authenticate: return ""
-        case .log: return "ekmobile-bigmart-dev"
-        case .event: return "ekmobile-bigmart-event-dev"
+        case .log(let projectID): return "init/\(projectID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
+        case .event(let projectID): return "event/\(projectID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
+        case .info(let domain): return "sdk_info/\(domain.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
         }
     }
     
     private var method: String {
         switch self {
-        case .log, .event, .authenticate:
+        case .log, .event:
             return "POST"
-//        default:
-//            return "GET"
+        default:
+            return "GET"
         }
     }
     
@@ -62,16 +65,11 @@ enum EndPoint {
                 request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: .prettyPrinted)
             }
         }
-        //        request.setValue(Configuration.conf.apiKey, forHTTPHeaderField: "Api-Key")
-        //        request.setValue(Localize.currentLanguage(), forHTTPHeaderField: "Accept-Language")
-        //        if let token = GlobalConstanst.KeyValues.accessToken?.token {
-        //            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        //        }
         return LogRequest(request: request, endPoint: self)
     }
     
     func request(body: [String: Any]? = nil) -> LogRequest {
-        let urlString = "https://drk.ekbana.net/topics/" + path
+        let urlString = baseURL + path
         return request(urlString: urlString, body: body)
     }
     
@@ -122,18 +120,12 @@ extension URLSession {
            let string = String(data: data, encoding: .utf8) {
             debugPrint(string)
         }
-//        let statuscode = (response as? HTTPURLResponse)?.statusCode ?? 500
         if let data = data {
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let container = try decoder.decode(T.self, from: data)
-//                if let error = container.allErrors?.first?.error {
-//                    return send(error: error)
-//                }
-//                if container.hasData {
                 return send(object: container)
-//                }
             } catch {
                 debugPrint(error)
             }
