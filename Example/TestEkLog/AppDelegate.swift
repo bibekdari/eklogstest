@@ -16,10 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let logUser = "drk"
-        let logPassword = "Drk@ekbana31"
-        logger = Eklogs(user: logUser, password: logPassword)
-        logger?.sessionStart()
+        let logUser = "sdkuser"
+        let logPassword = "3kl0gS5Dk!@#"
+        let domain = "bigmart-mobile"
+        logger = Eklogs(user: logUser, password: logPassword, domain: domain)
         return true
     }
 
