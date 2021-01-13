@@ -39,7 +39,7 @@ public class Eklogs: NSObject {
         let urlSession = URLSession.shared
         var request = EndPoint.info(logDomain).request()
         request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
-        urlSession.dataTask(request: request) { (sdkInfo: SDKInfo) in
+        urlSession.dataTask(request: request) { (sdkInfo: SDKInfo?) in
             self.sdkInfo = sdkInfo
             self.sessionStart()
         } failure: { (error) in
@@ -64,7 +64,7 @@ public class Eklogs: NSObject {
             var request = EndPoint.log(projectID).request(body: param as [String : Any])
             request.request.setValue(sdkInfo?.token, forHTTPHeaderField: "token")
             request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
-            urlSession.dataTask(request: request) { (object: LogResponse) in
+            urlSession.dataTask(request: request) { (object: LogResponse?) in
                 
             } failure: { (error) in
                 debugPrint(error)
@@ -138,7 +138,7 @@ public class Eklogs: NSObject {
         var request = EndPoint.event(projectID).request(body: param as [String : Any])
         request.request.setValue(sdkInfo?.token, forHTTPHeaderField: "token")
         request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
-        urlSession.dataTask(request: request) { (object: LogResponse) in
+        urlSession.dataTask(request: request) { (object: LogResponse?) in
             
         } failure: { (error) in
             debugPrint(error)
