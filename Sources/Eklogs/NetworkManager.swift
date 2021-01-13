@@ -20,6 +20,7 @@ struct SingleContainer<T: Codable>: Container {
     var hasData: Bool {
         return data != nil
     }
+    let msg: String
 }
 
 struct LogResponse: Codable {
@@ -84,15 +85,11 @@ enum EndPoint {
 extension URLSession {
     
     @discardableResult
-    func dataTask<T:Codable>(request: LogRequest, success: @escaping (T) -> (), failure: @escaping (Error) -> ()) -> URLSessionDataTask {
+    func dataTask<T:Codable>(request: LogRequest, success: @escaping (T?) -> (), failure: @escaping (Error) -> ()) -> URLSessionDataTask {
         let task = dataTask(with: request.request) { [weak self] (data, response, error) in
             self?.handle(data: data, response: response, error: error, success: { (successData: SingleContainer<T>) in
                 debugPrint(request.request.url?.absoluteURL ?? "")
-                if let data: T = successData.data {
-                    success(data)
-                }else {
-                    failure(NSError(domain: "EKLogs", code: 500, userInfo: [NSLocalizedDescriptionKey: "Something went wrong. No data found."]))
-                }
+                success(successData.data)
             }, failure: { error in
                 debugPrint(request.request.url?.absoluteURL ?? "")
                 failure(error)
