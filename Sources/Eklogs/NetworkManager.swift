@@ -17,6 +17,9 @@ struct SingleContainer<T: Codable>: Container {
     var data: T? {
         return offsets ?? result
     }
+    var hasData: Bool {
+        return data != nil
+    }
 }
 
 struct LogResponse: Codable {
@@ -85,7 +88,11 @@ extension URLSession {
         let task = dataTask(with: request.request) { [weak self] (data, response, error) in
             self?.handle(data: data, response: response, error: error, success: { (successData: SingleContainer<T>) in
                 debugPrint(request.request.url?.absoluteURL ?? "")
-                success(successData.data!)
+                if let data: T = successData.data {
+                    success(data)
+                }else {
+                    failure(NSError(domain: "EKLogs", code: 500, userInfo: [NSLocalizedDescriptionKey: "Something went wrong. No data found."]))
+                }
             }, failure: { error in
                 debugPrint(request.request.url?.absoluteURL ?? "")
                 failure(error)
