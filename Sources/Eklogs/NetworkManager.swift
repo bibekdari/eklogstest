@@ -14,6 +14,9 @@ protocol Container: Codable {
 struct SingleContainer<T: Codable>: Container {
     let offsets: T?
     let result: T?
+    var data: T? {
+        return offsets ?? result
+    }
 }
 
 struct LogResponse: Codable {
@@ -82,7 +85,7 @@ extension URLSession {
         let task = dataTask(with: request.request) { [weak self] (data, response, error) in
             self?.handle(data: data, response: response, error: error, success: { (successData: SingleContainer<T>) in
                 debugPrint(request.request.url?.absoluteURL ?? "")
-                success(successData.offsets!)
+                success(successData.data!)
             }, failure: { error in
                 debugPrint(request.request.url?.absoluteURL ?? "")
                 failure(error)
