@@ -52,14 +52,12 @@ public class Eklogs: NSObject {
             debugPrint("No project ID found")
             return
         }
-        var sessionData: [String: String?] = [:]
+        var sessionData: [String: String] = [:]
         
         func start() {
             let urlSession = URLSession.shared
             let param = [
-                "records": [
-                    "value": sessionData
-                ]
+                "records": sessionData
             ]
             var request = EndPoint.log(projectID).request(body: param as [String : Any])
             request.request.setValue(sdkInfo?.token, forHTTPHeaderField: "token")
@@ -81,7 +79,7 @@ public class Eklogs: NSObject {
         sessionData["versionCode"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         sessionData["locale"] = Locale.current.languageCode
         sessionData["deviceId"] = UIDevice.current.identifierForVendor?.uuidString
-        sessionData["osType"] = UIDevice.current.systemName
+        sessionData["os"] = UIDevice.current.systemName
         sessionData["osVersion"] = UIDevice.current.systemVersion
         sessionData["height"] = "\(UIScreen.main.bounds.height)"
         sessionData["width"] = "\(UIScreen.main.bounds.width)"
@@ -130,9 +128,7 @@ public class Eklogs: NSObject {
             "y": y
         ]
         let param = [
-            "records": [
-                "value": eventDict
-            ]
+            "records": eventDict
         ]
         let urlSession = URLSession.shared
         var request = EndPoint.event(projectID).request(body: param as [String : Any])
