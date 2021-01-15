@@ -69,7 +69,8 @@ public class Eklogs: NSObject {
             }
         }
         
-        if let data = try? Data(contentsOf: URL(string: "http://whatismyip.akamai.com/")!), let ip = String(data: data, encoding: .utf8) {
+        if let data = try? Data(contentsOf: URL(string: "http://whatismyip.akamai.com/")!),
+           let ip = String(data: data, encoding: .utf8) {
             sessionData["ipAddress"] = ip
         }
         
