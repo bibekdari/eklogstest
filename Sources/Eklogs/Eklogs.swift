@@ -47,6 +47,27 @@ public class Eklogs: NSObject {
         }
     }
     
+    func registerIdentity(userID: String) {
+        guard let projectID = sdkInfo?.projectId else {
+            debugPrint("No project ID found")
+            return
+        }
+        let urlSession = URLSession.shared
+        let param = [
+            "sessionId": "\(sessionID.timeIntervalSince1970)",
+            "userId": userID
+        ]
+        var request = EndPoint.identity(projectID).request(body: param as [String : Any])
+        request.request.setValue(sdkInfo?.token, forHTTPHeaderField: "token")
+        request.request.setValue("Basic \(authorization())", forHTTPHeaderField: "Authorization")
+        
+        urlSession.dataTask(request: request) { (sdkInfo: LogResponse?) in
+            
+        } failure: { (error) in
+            debugPrint(error)
+        }
+    }
+    
     func sessionStart() {
         guard let projectID = sdkInfo?.projectId else {
             debugPrint("No project ID found")

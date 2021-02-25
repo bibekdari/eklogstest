@@ -43,18 +43,20 @@ enum EndPoint {
     case log(String)
     case event(String)
     case info(String)
+    case identity(String)
     
     private var path: String {
         switch self {
         case .log(let projectID): return "init/\(projectID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
         case .event(let projectID): return "event/\(projectID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
         case .info(let domain): return "sdk_info/\(domain.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
+        case .identity(let projectID): return "identity/\(projectID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
         }
     }
     
     private var method: String {
         switch self {
-        case .log, .event:
+        case .log, .event, .identity:
             return "POST"
         default:
             return "GET"
