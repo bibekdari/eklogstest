@@ -47,7 +47,7 @@ public class Eklogs: NSObject {
         }
     }
     
-    func registerIdentity(userID: String) {
+    public func registerIdentity(userID: String) {
         guard let projectID = sdkInfo?.projectId else {
             debugPrint("No project ID found")
             return
