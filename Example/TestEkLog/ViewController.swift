@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     @IBAction func clicked(_ sender: UIButton) {
         let logger = (UIApplication.shared.delegate as? AppDelegate)?.logger
         logger?.log(eventName: "click", eventType: "AdButton", userID: nil, x: "\(sender.frame.midX)", y: "\(sender.frame.midY)")
+        logger?.registerIdentity(userID: "1234")
     }
     
 }
