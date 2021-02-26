@@ -15,8 +15,12 @@ public class Eklogs: NSObject {
     var logDomain: String
     var latitude: Double?
     var longitude: Double?
-    var sessionID: Date = Date()
+    var _sessionID: Date = Date()
     var locationObtained: (()->())?
+    
+    public var sessionID: String {
+        return "\(_sessionID.timeIntervalSince1970)"
+    }
     
     var sdkInfo: SDKInfo?
     
@@ -54,7 +58,7 @@ public class Eklogs: NSObject {
         }
         let urlSession = URLSession.shared
         let param = [
-            "sessionId": "\(sessionID.timeIntervalSince1970)",
+            "sessionId": sessionID,
             "userId": userID
         ]
         var request = EndPoint.identity(projectID).request(body: param as [String : Any])
@@ -99,7 +103,7 @@ public class Eklogs: NSObject {
         sessionData["brand"] = "Apple"
         sessionData["device"] = UIDevice.modelName
         sessionData["deviceType"] = UIDevice.current.model
-        sessionData["sessionId"] = "\(sessionID.timeIntervalSince1970)"
+        sessionData["sessionId"] = sessionID
         sessionData["applicationid"] = Bundle.main.bundleIdentifier
         sessionData["versionNum"] = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
         sessionData["versionCode"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
@@ -148,7 +152,7 @@ public class Eklogs: NSObject {
         let eventDict = [
             "eventName": eventName,
             "eventType": eventType,
-            "sessionId": "\(sessionID.timeIntervalSince1970)",
+            "sessionId": sessionID,
             "userId":userID,
             "x": x,
             "y": y
